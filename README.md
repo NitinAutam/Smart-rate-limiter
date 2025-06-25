@@ -1,98 +1,126 @@
-# Smart Rate Limiting SDK + Admin Panel (POC)
+# Smart Rate Limiting SDK + Admin Panel (Proof of Concept)
 
-A proof-of-concept demonstrating a flexible, rule-based rate limiter using:
-- Context-aware SDK middleware
-- Express.js backend for rule/context APIs
-- React + Tailwind Admin Panel for rule creation and visibility
+**Note**: This POC uses Express.js for rapid development under time constraints. If selected for further work, I plan to refactor the backend using **TypeScript** and the **Godspeed framework** to ensure scalability, type safety, and production-grade maintainability.
+
+A modular, dynamic rate-limiting system that combines:
+
+* Context-aware SDK middleware
+* Express.js backend with APIs for rules and context
+* React + Tailwind Admin Panel for rule management and visibility
 
 ---
 
-## Goal
+##  Objective
 
-To prove that request-level access decisions can be made dynamically using:
-- Cached service-specific rules (TTL-based)
-- Fresh runtime context (usage, user tier, org ID)
-- Simple rule engine (`if usage < 500 && userTier == 'premium' then allow`)
+To demonstrate a robust mechanism for request-level access control using:
 
-## Architecture
+* **TTL-based caching** of service-specific rules
+* **Real-time context** from incoming requests (usage, tier, org ID)
+* **Declarative rule evaluation**, e.g.:
+  `if usage < 500 && userTier == 'premium' then allow`
 
+---
+
+##  Architecture Overview
+
+```
 Client Request
-↓
-[ SDK Middleware ]
-↙ ↘
-[ Rules Cache ] ← if missing, fetch from backend
-↓
-[ Context API ] ← always fetch fresh data
-↓
-[ Rule Engine ]
-↓
-Allow or Block (429) → Forward to Target Service
-
-## 📂 Folder Structure
-
-/smart-rate-limiter
-├── backend/ ← Express backend with /rules & /context endpoints
-├── sdk/ ← Middleware SDK to rate-limit requests
-├── admin/ ← React + Tailwind admin panel for rule management
+       ↓
+ [ SDK Middleware ]
+     ↙      ↘
+[ Rules Cache ] ← (Fetch from backend if missing or stale)
+       ↓
+[ Context API ] ← (Always fetch fresh)
+       ↓
+   [ Rule Engine ]
+       ↓
+ Allow or Block (HTTP 429) → Forward to Target Service
+```
 
 ---
 
-## 🚀 How to Run Locally
+##  Project Structure
+
+```
+/smart-rate-limiter
+├── backend/   # Express backend: /rules & /context endpoints
+├── sdk/       # Reusable middleware SDK for request evaluation
+├── admin/     # React + Tailwind admin interface
+```
+
+---
+
+##  Local Setup Instructions
 
 ### 1. Backend
+
 ```bash
 cd backend
 npm install
 npm run dev
-POST /rules — Add a rule
+```
 
-GET /rules — Fetch all rules
+**API Endpoints:**
 
-POST /context — Simulate usage + user tier context
+* `POST /rules` — Add a rule
+* `GET /rules` — List all rules
+* `POST /context` — Simulate context input (usage, tier)
 
-2. SDK Demo
-Inside /sdk, use the SDK as middleware:
+---
 
+### 2. SDK Middleware Demo
+
+```bash
 cd sdk
 npm install
 node demoApp.js
-Sample request:
+```
 
-bash
+**Sample Request:**
+
+```bash
 curl http://localhost:3000/payment-service \
   -H "Authorization: Bearer <your-jwt-token>"
+```
 
-Response:
+**Sample Responses:**
+
+```json
 { "message": "Request allowed by rate limiter" }
+```
 
-Blocked:
+```json
 { "error": "Rate limit exceeded", "rule": "usage > 500" }
+```
 
-3. Admin Panel
-bash
+---
+
+### 3. Admin Panel
+
+```bash
 cd admin
 npm install
 npm run dev
-Features:
+```
 
-View all rules
+**Key Features:**
 
-Create new rules
+* View and manage rate limiting rules
+* Create new conditional rules
+* Visualize simulated activity
+* Clean UI for edit/delete operations
 
-Preview recent activity (simulated)
+---
 
-Visual structure ready for simulation/edit/delete
+##  Features Implemented
 
- What’s Implemented
+*  SDK middleware with JWT parsing
+*  Rule and context APIs (Express)
+*  Lightweight rule evaluation engine
+*  Rule caching with TTL refresh
+*  Admin Panel built with React + Tailwind
+*  Simulated context-based rule enforcement
 
-Request-level rate limiter middleware
+---
 
-Rule + Context APIs
-
-Condition evaluator engine
-
-Rule caching (TTL-based)
-
-React Admin UI with Tailwind
-
-Simulated rule evaluation with context
+This POC validates that dynamic access control via smart rule engines and context evaluation is feasible, scalable, and developer-friendly.
