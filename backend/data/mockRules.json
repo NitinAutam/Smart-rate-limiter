@@ -1,0 +1,22 @@
+[
+  {
+    "service": "payment-service",
+    "conditions": [
+      {
+        "if": "userTier == 'premium'"
+      },
+      {
+        "if": "usage < 500"
+      }
+    ],
+    "action": "ALLOW",
+    "priority": 1
+  },
+  {
+    "service": "paymenttt",
+    "conditions": [
+       "usage<1000"
+    ],
+    "action": "ALLOW"
+  }
+]

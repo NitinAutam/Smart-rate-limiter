@@ -1,0 +1,38 @@
+# Top-level node_modules
+/node_modules/
+
+# node_modules in each subfolder
+admin-panel/node_modules/
+backend/node_modules/
+sdk/node_modules/
+demo-app/node_modules/
+
+# .env files in each service
+admin-panel/.env
+backend/.env
+sdk/.env
+demo-app/.env
+
+# Log files
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Build/dist folders if used
+admin-panel/dist/
+backend/dist/
+sdk/dist/
+demo-app/dist/
+
+# Vite/NextJS/React cache
+admin-panel/.next/
+admin-panel/.vite/
+sdk/.next/
+sdk/.vite/
+demo-app/.next/
+demo-app/.vite/
+
+# Optional: VS Code settings
+.vscode/
