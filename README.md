@@ -36,16 +36,50 @@ Client Request
        ↓
  Allow or Block (HTTP 429) → Forward to Target Service
 ```
+##  Smart Rate Limiter POC — Brief Summary
+
+### Request Flow
+
+- Client sends a request to `/payment-service` with a JWT in the `Authorization` header.
+
+### SDK Middleware
+
+- Extracts context (e.g. `userTier`, `usage`) from the JWT.
+- Fetches rules from `mockRules.json` or a backend API.
+- Matches the request's `service` and checks if all conditions pass.
+- If conditions match and `action === "ALLOW"`, it calls `next()` → request proceeds.
+- Otherwise, it responds with `429 Rate limit exceeded`.
+
+### Route Handler
+
+- Handles the request (e.g. `/payment-service`) only **if** middleware allows it.
+- Sends a success response like:
+  ```json
+  {
+    "message": "Request allowed by rate limiter",
+    "timestamp": "2025-06-26T12:34:56.000Z"
+  }
+
+### What This POC Demonstrates
+
+- **Rule-based access control** using centralized SDK middleware
+- **Dynamic evaluation** of requests based on live user/service context
+- **Admin-driven rule configuration** — no code changes or redeploys needed
 
 ---
 
 ##  Project Structure
 
 ```
+## Project Structure
+
 /smart-rate-limiter
-├── backend/   # Express backend: /rules & /context endpoints
-├── sdk/       # Reusable middleware SDK for request evaluation
-├── admin/     # React + Tailwind admin interface
+├── backend/ # Express backend: /rules & /context endpoints
+├── sdk/ # Reusable middleware SDK for request evaluation
+├── admin/ # React + Tailwind admin interface
+├── demo-app/ # Sample Express app using the SDK middleware
+│ └── demo.js # JWT generator + curl command helper
+
 ```
 
 ---
@@ -73,14 +107,6 @@ npm run dev
 ```bash
 cd sdk
 npm install
-node demoApp.js
-```
-
-**Sample Request:**
-
-```bash
-curl http://localhost:3000/payment-service \
-  -H "Authorization: Bearer <your-jwt-token>"
 ```
 
 **Sample Responses:**
@@ -102,6 +128,23 @@ cd admin
 npm install
 npm run dev
 ```
+#### 4. Demo App (Simulated Client)
+
+```bash
+cd demo-app
+npm install
+node demo.js
+
+This will:
+
+Generate a valid JWT token
+
+Print a curl command with the token for easy testing:
+
+bash
+curl -H "Authorization: Bearer <token>" http://localhost:3000/payment-service
+```
+
 
 **Key Features:**
 
@@ -120,7 +163,26 @@ npm run dev
 *  Rule caching with TTL refresh
 *  Admin Panel built with React + Tailwind
 *  Simulated context-based rule enforcement
+---
+
+## Demo Screenshots
+
+### Admin Panel – Create Rules
+
+<img src="./demo-photos/1.png" alt="Admin Panel" width="700"/>
 
 ---
+
+### Admin Panel – View Rules
+
+<img src="./demo-photos/2.png" alt="Admin Panel" width="700"/>
+
+---
+
+### Postman Test – Rate Limit Result
+
+<img src="./demo-photos/3.png" alt="Postman Test" width="700"/>
+
+
 
 This POC validates that dynamic access control via smart rule engines and context evaluation is feasible, scalable, and developer-friendly.

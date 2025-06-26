@@ -14,7 +14,7 @@ exports.getRules = (req, res) => {
 exports.createRule = (req, res) => {
   const newRule = req.body;
   rules.push(newRule);
-
+   
   fs.writeFileSync(RULES_FILE, JSON.stringify(rules, null, 2));
   res.status(201).json({ message: 'Rule added', rule: newRule });
 };

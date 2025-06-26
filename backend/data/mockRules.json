@@ -13,9 +13,11 @@
     "priority": 1
   },
   {
-    "service": "paymenttt",
+    "service": "payment-service",
     "conditions": [
-       "usage<1000"
+      {
+        "if": "usage<1000"
+      }
     ],
     "action": "ALLOW"
   }

@@ -1,37 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function Rules() {
   const [rules, setRules] = useState([]);
   const [usingFallback, setUsingFallback] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);  
 
   useEffect(() => {
-    axios
-      .get('http://localhost:5000/rules')
-      .then((res) => {
-        setRules(res.data);
-        setUsingFallback(false);
-      })
-      .catch(() => {
-        setRules([
-          {
-            id: 'demo-1',
-            service: 'payment-service',
-            conditions: ['usage < 500', "userTier == 'premium'"],
-            action: 'ALLOW',
-          },
-          {
-            id: 'demo-2',
-            service: 'billing-service',
-            conditions: ['usage > 1000'],
-            action: 'BLOCK',
-          },
-        ]);
-        setUsingFallback(true);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  const fetchRules = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/rules/payment-service");
+      setRules(res.data);
+      setUsingFallback(false);
+    } catch (error) {
+      console.error("Using fallback rules:", error);
+      setRules([
+        {
+          id: "demo-1",
+          service: "payment-service",
+          conditions: ["usage < 500", "userTier == 'premium'"],
+          action: "ALLOW",
+        },
+      ]);
+      setUsingFallback(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchRules();
+}, []);
+
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
@@ -58,19 +57,24 @@ export default function Rules() {
               </thead>
               <tbody>
                 {rules.map((rule, index) => (
-                  <tr key={rule.id || index} className="border-t border-gray-800">
-                    <td className="p-3 font-mono text-gray-300">{rule.id}</td>
+                  <tr
+                    key={rule.id || index}
+                    className="border-t border-gray-800"
+                  >
+                    <td className="p-3 font-mono text-gray-300">{rule.id || `0${index + 1}`}</td>
                     <td className="p-3">{rule.service}</td>
                     <td className="p-3">
                       <ul className="list-disc list-inside space-y-1">
                         {rule.conditions.map((cond, i) => (
-                          <li key={i}>{cond}</li>
+                          <li key={i}>{cond.if}</li>
                         ))}
                       </ul>
                     </td>
                     <td
                       className={`p-3 font-bold ${
-                        rule.action === 'ALLOW' ? 'text-green-400' : 'text-red-400'
+                        rule.action === "ALLOW"
+                          ? "text-green-400"
+                          : "text-red-400"
                       }`}
                     >
                       {rule.action}

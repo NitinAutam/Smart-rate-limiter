@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 export default function CreateEditRule() {
-  const [service, setService] = useState('');
-  const [conditions, setConditions] = useState(['']);
-  const [action, setAction] = useState('ALLOW');
+  const [service, setService] = useState("");
+  const [conditions, setConditions] = useState([""]);
+  const [action, setAction] = useState("ALLOW");
   const [submitting, setSubmitting] = useState(false);
-  
+
   const handleConditionChange = (index, value) => {
     const updated = [...conditions];
     updated[index] = value;
     setConditions(updated);
   };
 
-  const addCondition = () => setConditions([...conditions, '']);
+  const addCondition = () => setConditions([...conditions, ""]);
+
   const removeCondition = (index) => {
     const updated = conditions.filter((_, i) => i !== index);
     setConditions(updated);
@@ -25,18 +26,20 @@ export default function CreateEditRule() {
 
     const rule = {
       service,
-      conditions: conditions.filter(Boolean),
+      conditions: conditions
+        .filter(Boolean)
+        .map((c) => (typeof c === "string" ? { if: c } : c)),
       action,
     };
 
     try {
-      await axios.post('http://localhost:5000/rules', rule);
-      alert(' Rule created!');
-      setService('');
-      setConditions(['']);
-      setAction('ALLOW');
+      await axios.post("http://localhost:5000/rules", rule);
+      alert(" Rule created!");
+      setService("");
+      setConditions([""]);
+      setAction("ALLOW");
     } catch (err) {
-      alert(' Backend not reachable. Using fallback.');
+      alert(" Backend not reachable. Using fallback.");
       console.log(err);
     } finally {
       setSubmitting(false);
@@ -52,10 +55,15 @@ export default function CreateEditRule() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8 bg-gray-900 p-6 rounded-xl border border-gray-800 shadow">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-8 bg-gray-900 p-6 rounded-xl border border-gray-800 shadow"
+      >
         {/* Service Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Target Service</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Target Service
+          </label>
           <input
             type="text"
             value={service}
@@ -68,7 +76,9 @@ export default function CreateEditRule() {
 
         {/* Conditions Section */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Rule Conditions</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Rule Conditions
+          </label>
           <div className="space-y-3">
             {conditions.map((cond, i) => (
               <div key={i} className="flex gap-2 items-center">
@@ -106,7 +116,9 @@ export default function CreateEditRule() {
 
         {/* Action Dropdown */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Action</label>
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Action
+          </label>
           <select
             value={action}
             onChange={(e) => setAction(e.target.value)}
@@ -124,11 +136,11 @@ export default function CreateEditRule() {
             disabled={submitting}
             className={`w-full py-3 rounded font-semibold transition ${
               submitting
-                ? 'bg-gray-700 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                ? "bg-gray-700 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}
           >
-            {submitting ? 'Saving Rule...' : 'Save Rule'}
+            {submitting ? "Saving Rule..." : "Save Rule"}
           </button>
         </div>
       </form>
